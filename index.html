@@ -1,1 +1,85 @@
-hi
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solde Wallet Solana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .wallet-balance {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="wallet-balance">
+        <h1>Solde du Wallet Solana</h1>
+        <p>Adresse du Wallet: <strong id="wallet-address"></strong></p>
+        <p>Solde: <span class="balance" id="balance">Chargement...</span></p>
+    </div>
+
+    <script>
+        // Adresse du wallet à surveiller
+        const walletAddress = "TonAdresseWalletIci";
+
+        // Mettre l'adresse dans la page
+        document.getElementById('wallet-address').innerText = walletAddress;
+
+        // Fonction pour obtenir le solde d'un wallet Solana
+        async function getSolanaBalance() {
+            try {
+                // API pour récupérer le solde
+                const response = await fetch(`https://api.mainnet-beta.solana.com`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "getBalance",
+                        "params": [walletAddress]
+                    })
+                });
+
+                const data = await response.json();
+                const lamports = data.result.value;
+
+                // Conversion de Lamports à SOL (1 SOL = 1e9 Lamports)
+                const solBalance = lamports / 1000000000;
+
+                // Afficher le solde sur la page
+                document.getElementById('balance').innerText = solBalance + " SOL";
+            } catch (error) {
+                console.error("Erreur lors de la récupération du solde :", error);
+                document.getElementById('balance').innerText = "Erreur";
+            }
+        }
+
+        // Appeler la fonction pour récupérer le solde
+        getSolanaBalance();
+    </script>
+</body>
+</html>

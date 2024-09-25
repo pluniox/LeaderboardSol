@@ -40,46 +40,40 @@
         <p>Solde: <span class="balance" id="balance">Chargement...</span></p>
     </div>
 
-    <script>
-        // Adresse du wallet à surveiller
-        const walletAddress = "44CEShj1mHomZLwpPQRJoy5D6TC1YPGPT4aVF19tunKs";
 
-        // Mettre l'adresse dans la page
-        document.getElementById('wallet-address').innerText = walletAddress;
+<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
 
-        // Fonction pour obtenir le solde d'un wallet Solana
-        async function getSolanaBalance() {
-            try {
-                // API pour récupérer le solde
-                const response = await fetch('https://api.mainnet-beta.solana.com', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        "jsonrpc": "2.0",
-                        "id": 1,
-                        "method": "getBalance",
-                        "params": [walletAddress]
-                    })
-                });
+<script>
+    // Adresse du wallet à surveiller
+    const walletAddress = "44CEShj1mHomZLwpPQRJoy5D6TC1YPGPT4aVF19tunKs";
 
-                const data = await response.json();
-                const lamports = data.result.value;
+    // Mettre l'adresse dans la page
+    document.getElementById('wallet-address').innerText = walletAddress;
 
-                // Conversion de Lamports à SOL (1 SOL = 1e9 Lamports)
-                const solBalance = lamports / 1000000000;
+    // Fonction pour obtenir le solde via web3.js
+    async function getSolanaBalance() {
+        try {
+            // Connecter à Solana
+            const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
 
-                // Afficher le solde sur la page
-                document.getElementById('balance').innerText = solBalance + " SOL";
-            } catch (error) {
-                console.error("Erreur lors de la récupération du solde :", error);
-                document.getElementById('balance').innerText = "Erreur";
-            }
+            // Récupérer le solde du wallet
+            const publicKey = new solanaWeb3.PublicKey(walletAddress);
+            const lamports = await connection.getBalance(publicKey);
+
+            // Conversion de Lamports à SOL
+            const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+
+            // Afficher le solde sur la page
+            document.getElementById('balance').innerText = solBalance + " SOL";
+        } catch (error) {
+            console.error("Erreur lors de la récupération du solde:", error);
+            document.getElementById('balance').innerText = "Erreur";
         }
+    }
 
-        // Appeler la fonction pour récupérer le solde
-        getSolanaBalance();
-    </script>
+    // Appeler la fonction pour récupérer le solde
+    getSolanaBalance();
+</script>
+
 </body>
 </html>
